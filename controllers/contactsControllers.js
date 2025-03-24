@@ -12,7 +12,7 @@ export const getAllContacts = async (req, res) => {
 
 export const getOneContact = async (req, res) => {
   try {
-    const contact = await contactsService.getContactById(req.params.contactId);
+    const contact = await contactsService.getContactById(req.params.id);
     if (!contact) {
       return res.status(404).json({ message: "Not found" });
     }
