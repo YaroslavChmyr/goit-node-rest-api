@@ -16,7 +16,7 @@ export const updateContact = async(id, data)=> {
     });
 }
 
-export const deleteContact = id => Contact.destroy({
+export const removeContact = id => Contact.destroy({
     where: {
         id,
     }
