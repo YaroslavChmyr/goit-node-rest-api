@@ -66,3 +66,13 @@ export const logoutUser = async id => {
 
     await user.update({token: null});
 }
+
+export const updateAvatar = async data => {
+    const { id, avatarURL } = data;
+    const user = await findUser({ id });
+    if (!user) {
+        throw HttpError(404, "User not found");
+    }
+
+    return user.update({ avatarURL });
+};

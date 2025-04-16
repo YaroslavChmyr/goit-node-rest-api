@@ -1,13 +1,20 @@
 import * as authServices from "../services/authServices.js";
 import { authSignupSchema, authSigninSchema } from "../schemas/authSchema.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import gravatar from "gravatar";
+import fs from "node:fs/promises";
+import path from "node:path";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 const signupController = async (req, res) => {
   const { error } = authSignupSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-  const newUser = await authServices.signupUser(req.body);
+  const { email } = req.body;
+  const avatarURL = gravatar.url(email, { s: "250", d: "identicon" });
+  const newUser = await authServices.signupUser({...req.body, avatarURL});
 
   res.status(201).json({
     email: newUser.email,
@@ -45,9 +52,26 @@ const logoutController = async(req, res)=> {
   })
 }
 
+const updateAvatarController = async (req, res) => {
+  let poster = null;
+  if(req.file) {
+    const {path: oldPath, filename} = req.file;
+    const newPath = path.join(avatarsDir, filename);
+    await fs.rename(oldPath, newPath);
+    poster = path.join("avatars", filename);
+  }
+  const { id } = req.user;
+  const data = await authServices.updateAvatar({ ...req.body, avatarURL: poster, id });
+
+  res.json({
+    avatarURL: data.avatarURL,
+  });
+}
+
 export default {
   signupController: ctrlWrapper(signupController),
   signinController: ctrlWrapper(signinController),
   getCurrentController: ctrlWrapper(getCurrentController),
   logoutController: ctrlWrapper(logoutController),
+  updateAvatarController: ctrlWrapper(updateAvatarController),
 };
