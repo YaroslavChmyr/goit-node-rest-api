@@ -1,4 +1,5 @@
 import express from "express";
+import authenticate from "../middlewares/authenticate.js";
 import {
   getAllContacts,
   getOneContact,
@@ -9,6 +10,8 @@ import {
 } from "../controllers/contactsControllers.js";
 
 const contactsRouter = express.Router();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get("/", getAllContacts);
 
