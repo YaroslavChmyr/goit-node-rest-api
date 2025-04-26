@@ -12,6 +12,10 @@ authRouter.post("/register",  authControllers.signupController);
 
 authRouter.post("/login", authControllers.signinController);
 
+authRouter.get("/verify/:verificationCode", authControllers.verifyController);
+
+authRouter.post("/verify", authControllers.resendVerifyEmailController);
+
 authRouter.get("/current", authenticate, authControllers.getCurrentController);
 
 authRouter.post("/logout", authenticate, authControllers.logoutController);

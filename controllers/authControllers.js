@@ -1,11 +1,33 @@
 import * as authServices from "../services/authServices.js";
-import { authSignupSchema, authSigninSchema } from "../schemas/authSchema.js";
+import { authSignupSchema, authSigninSchema, authVerifySchema } from "../schemas/authSchema.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import gravatar from "gravatar";
 import fs from "node:fs/promises";
 import path from "node:path";
 
 const avatarsDir = path.resolve("public", "avatars");
+
+const verifyController = async(req, res)=> {
+  const {verificationCode} = req.params;
+  await authServices.verifyUser(verificationCode);
+
+  res.json({
+      message: "Email verified successfully"
+  })
+}
+
+const resendVerifyEmailController = async(req, res)=> {
+  const { error } = authVerifySchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+  const {email} = req.body;
+  await authServices.resendVerifyEmail(email);
+
+  res.json({
+      message: "Verify email resend"
+  })
+}
 
 const signupController = async (req, res) => {
   const { error } = authSignupSchema.validate(req.body);
@@ -74,4 +96,6 @@ export default {
   getCurrentController: ctrlWrapper(getCurrentController),
   logoutController: ctrlWrapper(logoutController),
   updateAvatarController: ctrlWrapper(updateAvatarController),
+  verifyController: ctrlWrapper(verifyController),
+  resendVerifyEmailController: ctrlWrapper(resendVerifyEmailController),
 };
